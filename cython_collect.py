@@ -1,6 +1,7 @@
 import importlib
 import os
 import pathlib
+import sys
 import sysconfig
 
 import pytest
@@ -40,6 +41,7 @@ def pytest_collect_file(path, parent):
 
 class CythonModule(pytest.Module):
     def collect(self):
+        sys.path.append(os.path.dirname(self.fspath))
         mod = importlib.import_module(
             os.path.splitext(os.path.basename(self.fspath))[0]
         )
@@ -58,3 +60,6 @@ class CythonModule(pytest.Module):
 
         # for _class in test_classes:
         #     yield from yield_functions(getattr(mod, _class))
+
+        # Remove path in an attempt to not conflict any later imports
+        sys.path.pop()
